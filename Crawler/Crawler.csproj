@@ -258,6 +258,7 @@
       <LastGenOutput>dbManager.Context.cs</LastGenOutput>
       <DependentUpon>dbManager.edmx</DependentUpon>
     </Content>
+    <Content Include="dbManager.edmx.sql" />
     <Content Include="dbManager.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>dbManager.edmx</DependentUpon>

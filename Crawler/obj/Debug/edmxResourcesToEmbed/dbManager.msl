@@ -2,7 +2,7 @@
 <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
   <EntityContainerMapping StorageEntityContainer="WebCrawlerModelStoreContainer" CdmEntityContainer="DBCrawling">
     <EntitySetMapping Name="tblMainUrls">
-      <EntityTypeMapping TypeName="WebCrawlerModel.tblMainUrl">
+      <EntityTypeMapping TypeName="IsTypeOf(WebCrawlerModel.tblMainUrl)">
         <MappingFragment StoreEntitySet="tblMainUrls">
           <ScalarProperty Name="UrlHash" ColumnName="UrlHash" />
           <ScalarProperty Name="Url" ColumnName="Url" />

@@ -97,7 +97,7 @@ namespace Crawler
             // vrDocTitle = System.Net.WebUtility.HtmlDecode(vrDocTitle);
             crawlResult.PageTile = vrDocTitle;
 
-            
+
 
 
 
@@ -171,10 +171,10 @@ namespace Crawler
                         if (!string.IsNullOrEmpty(crawledResult.SourceCode))
                         {
 
-
+                            //// Bu bölümde (btye) yazan yerde convert.toByte yazıyordu bu sebeple hata alıyordum 
                             double dblOriginalSourceCodeLenght = crawledResult.SourceCode.Length;
                             crawledResult.SourceCode = crawledResult.SourceCode.CompressString();
-                            crawledResult.CompressionPercent = Convert.ToByte(
+                            crawledResult.CompressionPercent = (Byte)(
                                 Math.Floor(
                                     ((crawledResult.SourceCode.Length.ToDouble() / dblOriginalSourceCodeLenght) * 100))
                                 );
@@ -274,15 +274,15 @@ namespace Crawler
                     myCrawlingResult.lstDiscoveredLinks.Add(absoluteUri.ToString().Split('#').FirstOrDefault());
 
 
-                    
-                    
+
+
 
 
                 }
 
             myCrawlingResult.lstDiscoveredLinks = myCrawlingResult.lstDiscoveredLinks.Distinct().Where(pr => pr.Length < 201).ToList();
 
-            
+
         }
 
         private static StreamWriter swErrorLogs = new StreamWriter("error_logs.txt", append: true, encoding: Encoding.UTF8);

@@ -189,17 +189,24 @@ namespace Crawler
             }
         }
 
+        private void btnPause_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
 
+        private void btnClear_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
 
+        private void btnAddFav_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
 
+        private void btnClearFav_Click(object sender, RoutedEventArgs e)
+        {
 
-
-
-
-
-
+        }
     }
 }
