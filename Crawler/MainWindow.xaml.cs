@@ -18,6 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MahApps.Metro.IconPacks;
 using static Crawler.csHelperMethods;
+using System.Data.Entity;
 
 namespace Crawler
 {
@@ -71,19 +72,7 @@ namespace Crawler
 
         DateTime dtStartDate;
 
-        private void btnTest_Click(object sender, RoutedEventArgs e)
-        {
-
-            using (DBCrawling db = new DBCrawling())
-            {
-                db.tblMainUrls.RemoveRange(db.tblMainUrls);
-                db.SaveChanges();
-
-                db.tblMainUrls.Add(new tblMainUrl { Url = "www.toros.edu.tr", ParentUrlHash = "www.toros.edu.tr", SourceCode = "gg", UrlHash = "ww" });
-                db.SaveChanges();
-            }
-        }
-
+      
 
         private void clearDBandStart(object sender, RoutedEventArgs e)
         {
@@ -194,15 +183,56 @@ namespace Crawler
 
         }
 
+
+
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
+            using (DBCrawling db = new DBCrawling())
+            {
+                try
+                {
+                    csHelperMethods.clearDatabase();
+
+                }
+                catch(Exception ex) {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
+        private void btnTest_Click(object sender, RoutedEventArgs e)
+        {
+
+           
+            using (DBCrawling db = new DBCrawling())
+            {
+                try
+                {
+                    csHelperMethods.clearDatabase();
+                    db.tblMainUrls.Add(new tblMainUrl { Url = "www.toros.edu.tr", ParentUrlHash = "www.toros.edu.tr", SourceCode = "gg", UrlHash = "ww", DiscoverDate = DateTime.Today, LinkDepthLevel = 0, LastCrawlingDate = DateTime.Now, FetchTimeMS= 1, CompressionPercent = 1, IsCrawled = true, HostUrl = "ww", CrawlTryCounter = 2 });
+                    db.SaveChanges();
+
+                    MessageBox.Show("Database Connection Succesfully");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+
+
 
         }
+
+
 
         private void btnAddFav_Click(object sender, RoutedEventArgs e)
         {
 
         }
+
+
+
 
         private void btnClearFav_Click(object sender, RoutedEventArgs e)
         {
