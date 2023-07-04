@@ -54,12 +54,22 @@ namespace Crawler
 
 
         private ObservableCollection<string> _Results = new ObservableCollection<string>();
+        private ObservableCollection<string> _Summary = new ObservableCollection<string>();
+
         public ObservableCollection<string> UserLogs
         {
             get { return _Results; }
             set
             {
                 _Results = value;
+            }
+        }
+        public ObservableCollection<string> LogSummary
+        {
+            get { return _Summary; }
+            set
+            {
+                _Summary = value;
             }
         }
 
@@ -71,6 +81,7 @@ namespace Crawler
             ThreadPool.SetMinThreads(100000, 100000);
             ServicePointManager.DefaultConnectionLimit = 1000;//this increases your number of connections to per host at the same time
             listBoxResults.ItemsSource = UserLogs;
+            lstUserLogs.ItemsSource = LogSummary;
             fillFromDbDropdown();
         }
 
@@ -86,7 +97,7 @@ namespace Crawler
                 {
                     var favUrlList = db.tblFavUrls.ToList();
                     foreach (var fav in favUrlList)
-                    dropFavSelector.Items.Add(fav.favUrls);
+                        dropFavSelector.Items.Add(fav.favUrls);
                     txtInputUrl.Text = string.Empty;
                     db.SaveChanges();
                 }
@@ -98,11 +109,11 @@ namespace Crawler
         }
 
 
-      
 
 
 
-    DateTime dtStartDate;
+
+        DateTime dtStartDate;
 
 
 
@@ -138,17 +149,17 @@ namespace Crawler
 
         private void startPollingAwaitingURLs(object sender, EventArgs e)
         {
-            lock (UserLogs)
+            lock (LogSummary)
             {
                 string srPerMinCrawlingspeed = (irCrawledUrlCount.ToDouble() / (DateTime.Now - dtStartDate).TotalMinutes).ToString("N2");
 
                 string srPerMinDiscoveredLinkSpeed = (irDiscoveredUrlCount.ToDouble() / (DateTime.Now - dtStartDate).TotalMinutes).ToString("N2");
 
                 string srPassedTime = (DateTime.Now - dtStartDate).TotalMinutes.ToString("N2");
-
-                UserLogs.Insert(0, $"{DateTime.Now} polling awaiting urls \t processing: {blBeingProcessed} \t number of crawling tasks: {lstCrawlingTasks.Count}");
-
-                UserLogs.Insert(0, $"Total Time: {srPassedTime} Minutes \t Total Crawled Links Count: {irCrawledUrlCount.ToString("N0")} \t Crawling Speed Per Minute: {srPerMinCrawlingspeed} \t Total Discovered Links : {irDiscoveredUrlCount.ToString("N0")} \t Discovered Url Speed: {srPerMinDiscoveredLinkSpeed} ");
+                LogSummary.Clear();
+                LogSummary.Insert(0, $"Total Time: {srPassedTime} Minutes \t Total Crawled Links Count: {irCrawledUrlCount.ToString("N0")}");
+                LogSummary.Insert(0, $"{DateTime.Now} polling awaiting urls \t processing: {blBeingProcessed} \t Number of crawling tasks: {lstCrawlingTasks.Count}");
+                LogSummary.Insert(0, $"Crawling Speed Per Minute: {srPerMinCrawlingspeed} \t Total Discovered Links : {irDiscoveredUrlCount.ToString("N0")} \t Discovered Url Speed: {srPerMinDiscoveredLinkSpeed} ");
             }
 
             logMesssage($"polling awaiting urls \t processing: {blBeingProcessed} \t number of crawling tasks: {lstCrawlingTasks.Count}");
@@ -288,7 +299,7 @@ namespace Crawler
                         db.tblFavUrls.Add(new tblFavUrls { favUrls = txtInputUrl.Text });
                         db.SaveChanges();
                         fillFromDbDropdown();
-                        
+
                     }
                     catch (Exception ex)
                     {
@@ -358,25 +369,25 @@ namespace Crawler
         }
 
 
-        
-       
 
-        
+
+
+
 
         private void dropFavSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-          
-            try
-            {
+            if (dropFavSelector.SelectedItem != null)
+                try
+                {
 
-            string selectedValue = dropFavSelector.SelectedValue.ToString();
-            txtInputUrl.Text = selectedValue;
-               
-            }
-            catch (Exception ex) 
-            {
-                txtInputUrl.Text = (ex.Message);
-            }
+                    string selectedValue = dropFavSelector.SelectedValue.ToString();
+                    txtInputUrl.Text = selectedValue;
+
+                }
+                catch (Exception ex)
+                {
+                    txtInputUrl.Text = (ex.Message);
+                }
         }
     }
 }
