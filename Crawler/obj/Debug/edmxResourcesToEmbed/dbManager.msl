@@ -1,8 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
   <EntityContainerMapping StorageEntityContainer="WebCrawlerModelStoreContainer" CdmEntityContainer="DBCrawling">
+    <EntitySetMapping Name="tblFavUrls">
+      <EntityTypeMapping TypeName="WebCrawlerModel.tblFavUrls">
+        <MappingFragment StoreEntitySet="tblFavUrls">
+          <ScalarProperty Name="ID" ColumnName="ID" />
+          <ScalarProperty Name="favUrls" ColumnName="favUrls" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
     <EntitySetMapping Name="tblMainUrls">
-      <EntityTypeMapping TypeName="IsTypeOf(WebCrawlerModel.tblMainUrl)">
+      <EntityTypeMapping TypeName="WebCrawlerModel.tblMainUrl">
         <MappingFragment StoreEntitySet="tblMainUrls">
           <ScalarProperty Name="UrlHash" ColumnName="UrlHash" />
           <ScalarProperty Name="Url" ColumnName="Url" />

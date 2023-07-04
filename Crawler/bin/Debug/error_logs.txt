@@ -12384,3 +12384,33 @@ The operation has timed out
 
 ************************************
 
+crawlPage	4.07.2023 04:28:56
+
+Invalid URI: The format of the URI could not be determined.
+
+
+
+   at System.Uri.CreateThis(String uri, Boolean dontEscape, UriKind uriKind)
+   at System.Uri..ctor(String uriString)
+   at HtmlAgilityPack.HtmlWeb.Load(String url) in C:\Repos\HtmlAgilityPack\HtmlAgilityPack.Shared\HtmlWeb.cs:line 1199
+   at Crawler.csHelperMethods.crawlPage(String srUrlToCrawl, Int32 irUrlDepthLevel, String _srParentUrl, DateTime _dtDiscoverDate) in C:\Users\Burak\Desktop\WebCrawler\Crawler\csHelperMethods.cs:line 78
+
+
+
+************************************
+
+crawlPage	4.07.2023 04:29:12
+
+Invalid URI: The format of the URI could not be determined.
+
+
+
+   at System.Uri.CreateThis(String uri, Boolean dontEscape, UriKind uriKind)
+   at System.Uri..ctor(String uriString)
+   at HtmlAgilityPack.HtmlWeb.Load(String url) in C:\Repos\HtmlAgilityPack\HtmlAgilityPack.Shared\HtmlWeb.cs:line 1199
+   at Crawler.csHelperMethods.crawlPage(String srUrlToCrawl, Int32 irUrlDepthLevel, String _srParentUrl, DateTime _dtDiscoverDate) in C:\Users\Burak\Desktop\WebCrawler\Crawler\csHelperMethods.cs:line 78
+
+
+
+************************************
+

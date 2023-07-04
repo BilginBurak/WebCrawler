@@ -1,5 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Schema Namespace="WebCrawlerModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="tblFavUrls">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="favUrls" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+  </EntityType>
   <EntityType Name="tblMainUrl">
     <Key>
       <PropertyRef Name="UrlHash" />
@@ -19,6 +26,7 @@
     <Property Name="CrawlTryCounter" Type="Byte" Nullable="false" />
   </EntityType>
   <EntityContainer Name="DBCrawling" annotation:LazyLoadingEnabled="true">
-    <EntitySet Name="tblMainUrls" EntityType="Self.tblMainUrl" />
+    <EntitySet Name="tblFavUrls" EntityType="Self.tblFavUrls" />
+    <EntitySet Name="tblMainUrls" EntityType="WebCrawlerModel.tblMainUrl" />
   </EntityContainer>
 </Schema>

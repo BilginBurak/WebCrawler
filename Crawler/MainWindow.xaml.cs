@@ -19,6 +19,9 @@ using System.Windows.Shapes;
 using MahApps.Metro.IconPacks;
 using static Crawler.csHelperMethods;
 using System.Data.Entity;
+using System.Runtime.Remoting.Contexts;
+using System.Web.UI.WebControls;
+using System.Web.Configuration;
 
 namespace Crawler
 {
@@ -68,18 +71,56 @@ namespace Crawler
             ThreadPool.SetMinThreads(100000, 100000);
             ServicePointManager.DefaultConnectionLimit = 1000;//this increases your number of connections to per host at the same time
             listBoxResults.ItemsSource = UserLogs;
+            fillFromDbDropdown();
         }
 
-        DateTime dtStartDate;
+
+
+
+        private void fillFromDbDropdown()
+        {
+            dropFavSelector.Items.Clear();
+            using (DBCrawling db = new DBCrawling())
+            {
+                try
+                {
+                    var favUrlList = db.tblFavUrls.ToList();
+                    foreach (var fav in favUrlList)
+                    dropFavSelector.Items.Add(fav.favUrls);
+                    txtInputUrl.Text = string.Empty;
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+        }
+
 
       
 
+
+
+    DateTime dtStartDate;
+
+
+
         private void clearDBandStart(object sender, RoutedEventArgs e)
         {
-            dtStartDate = DateTime.Now;
-            // clearDatabase();
-            crawlPage(txtInputUrl.Text.normalizeUrl(), 0, txtInputUrl.Text.normalizeUrl(), DateTime.Now);
-            checkingTimer();
+            if (txtInputUrl.Text.IsValidUrl() == false)
+            {
+                MessageBox.Show("please enter a valid url");
+                return;
+            }
+            else
+            {
+
+                dtStartDate = DateTime.Now;
+                // clearDatabase();
+                crawlPage(txtInputUrl.Text.normalizeUrl(), 0, txtInputUrl.Text.normalizeUrl(), DateTime.Now);
+                checkingTimer();
+            }
         }
 
         private void checkingTimer()
@@ -178,9 +219,14 @@ namespace Crawler
             }
         }
 
-        private void btnPause_Click(object sender, RoutedEventArgs e)
-        {
 
+
+
+
+        private void btnCleanTxt_Click(object sender, RoutedEventArgs e)
+        {
+            fillFromDbDropdown();
+            txtInputUrl.Focus();
         }
 
 
@@ -194,24 +240,25 @@ namespace Crawler
                     csHelperMethods.clearDatabase();
 
                 }
-                catch(Exception ex) {
+                catch (Exception ex)
+                {
                     MessageBox.Show(ex.Message);
                 }
             }
         }
 
+
+
         private void btnTest_Click(object sender, RoutedEventArgs e)
         {
 
-           
+
             using (DBCrawling db = new DBCrawling())
             {
                 try
                 {
-                    csHelperMethods.clearDatabase();
-                    db.tblMainUrls.Add(new tblMainUrl { Url = "www.toros.edu.tr", ParentUrlHash = "www.toros.edu.tr", SourceCode = "gg", UrlHash = "ww", DiscoverDate = DateTime.Today, LinkDepthLevel = 0, LastCrawlingDate = DateTime.Now, FetchTimeMS= 1, CompressionPercent = 1, IsCrawled = true, HostUrl = "ww", CrawlTryCounter = 2 });
+                    db.tblMainUrls.Add(new tblMainUrl { Url = "www.toros.edu.tr", ParentUrlHash = "www.toros.edu.tr", SourceCode = "gg", UrlHash = "ww", DiscoverDate = DateTime.Today, LinkDepthLevel = 0, LastCrawlingDate = DateTime.Now, FetchTimeMS = 1, CompressionPercent = 1, IsCrawled = true, HostUrl = "ww", CrawlTryCounter = 2 });
                     db.SaveChanges();
-
                     MessageBox.Show("Database Connection Succesfully");
                 }
                 catch (Exception ex)
@@ -228,8 +275,40 @@ namespace Crawler
 
         private void btnAddFav_Click(object sender, RoutedEventArgs e)
         {
+            if (txtInputUrl.Text.IsValidUrl() == false)
+            {
+                MessageBox.Show("please enter a valid url");
+                return;
+            }
+            else
+                using (DBCrawling db = new DBCrawling())
+                {
+                    try
+                    {
+                        db.tblFavUrls.Add(new tblFavUrls { favUrls = txtInputUrl.Text });
+                        db.SaveChanges();
+                        fillFromDbDropdown();
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                }
+
+
+
+
+
 
         }
+
+
+
+
+
+
+
 
 
 
@@ -237,6 +316,67 @@ namespace Crawler
         private void btnClearFav_Click(object sender, RoutedEventArgs e)
         {
 
+            using (DBCrawling db = new DBCrawling())
+            {
+                try
+                {
+                    string selectedUrl = dropFavSelector.SelectedItem.ToString();
+
+                    tblFavUrls urlToRemove = db.tblFavUrls.FirstOrDefault(url => url.favUrls == selectedUrl);
+                    if (urlToRemove != null)
+                    {
+                        db.tblFavUrls.Remove(urlToRemove);
+                        db.SaveChanges();
+                        fillFromDbDropdown();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+
+                /*
+
+                try
+                {
+
+
+                    db.tblFavUrls.Remove(dropFavSelector.SelectedValue as tblFavUrls);
+
+                    db.SaveChanges();
+                    fillFromDbDropdown();
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                */
+            }
+
+        }
+
+
+        
+       
+
+        
+
+        private void dropFavSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+          
+            try
+            {
+
+            string selectedValue = dropFavSelector.SelectedValue.ToString();
+            txtInputUrl.Text = selectedValue;
+               
+            }
+            catch (Exception ex) 
+            {
+                txtInputUrl.Text = (ex.Message);
+            }
         }
     }
 }

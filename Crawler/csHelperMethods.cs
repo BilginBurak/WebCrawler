@@ -33,6 +33,21 @@ namespace Crawler
             }
         }
 
+
+        public static bool IsValidUrl(this string uriName)
+        {
+            Uri uriResult;
+            bool result = Uri.TryCreate(uriName, UriKind.Absolute, out uriResult)
+                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+
+            return result;
+        }
+
+
+
+
+
+
         public class crawlingResult : tblMainUrl
         {
             public crawlingResult()

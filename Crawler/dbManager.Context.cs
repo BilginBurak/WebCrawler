@@ -25,6 +25,7 @@ namespace Crawler
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<tblFavUrls> tblFavUrls { get; set; }
         public virtual DbSet<tblMainUrl> tblMainUrls { get; set; }
     }
 }

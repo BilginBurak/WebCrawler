@@ -186,12 +186,25 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="csHelperMethods.cs" />
+    <Compile Include="dbManager.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dbManager.Context.tt</DependentUpon>
+    </Compile>
     <Compile Include="dbManager.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>dbManager.tt</DependentUpon>
     </Compile>
+    <Compile Include="dbManager.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dbManager.edmx</DependentUpon>
+    </Compile>
     <Compile Include="StringCompressor.cs" />
+    <Compile Include="tblFavUrls.cs">
+      <DependentUpon>dbManager.tt</DependentUpon>
+    </Compile>
     <Compile Include="tblMainUrl.cs">
       <DependentUpon>dbManager.tt</DependentUpon>
     </Compile>
@@ -202,16 +215,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="dbManager.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>dbManager.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="dbManager.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>dbManager.edmx</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -255,8 +258,8 @@
   <ItemGroup>
     <Content Include="dbManager.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>dbManager.Context.cs</LastGenOutput>
       <DependentUpon>dbManager.edmx</DependentUpon>
+      <LastGenOutput>dbManager.Context.cs</LastGenOutput>
     </Content>
     <Content Include="dbManager.edmx.sql" />
     <Content Include="dbManager.tt">
