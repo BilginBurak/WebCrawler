@@ -71,7 +71,7 @@
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
 
-                                <Button x:Name="btnStartInitial" Click="clearDBandStart"  MinHeight="35" MinWidth="100" Content="Start Crawl" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100"/>
+                                <Button x:Name="btnStartInitial" Click="clearDBandStart"  MinHeight="35" MinWidth="100" Content="Start Crawl" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100" Background="#00000000"/>
                                 <Button x:Name="btnTest" Click="btnTest_Click" MinWidth="100" MinHeight="35" Content="Test DB" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100"/>
                                 <Button x:Name="btnCleanTxt" Click="btnCleanTxt_Click" MinWidth="100" MinHeight="35" Content="Clean URL" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100"/>
                                 <Button x:Name="btnClear" Click="btnClear_Click" MinWidth="100" MinHeight="35" Content="Clear Database" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100" />

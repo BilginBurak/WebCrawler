@@ -22,6 +22,7 @@ using System.Data.Entity;
 using System.Runtime.Remoting.Contexts;
 using System.Web.UI.WebControls;
 using System.Web.Configuration;
+using System.Windows.Threading;
 
 namespace Crawler
 {
@@ -73,6 +74,8 @@ namespace Crawler
             }
         }
 
+ 
+
         public MainWindow()
         {
             InitializeComponent();
@@ -116,9 +119,41 @@ namespace Crawler
         DateTime dtStartDate;
 
 
+        private static bool isCrawlPaused = false;
+        private System.Windows.Threading.DispatcherTimer dispatcherTimer;
+
+        private void checkingTimer()
+        {
+            if (isCrawlPaused)
+            {
+                // Crawl işlemi duraklatıyor
+                isCrawlPaused = false;
+                btnStartInitial.Content = "Continue";
+                btnStartInitial.Background = new SolidColorBrush(Color.FromArgb(10, 255, 0, 0));  // butonun rengini değiştirebilmek için
+                dispatcherTimer.Stop(); // Timer'ı duraklat
+
+            }
+            else
+            {
+                
+                //burası crawl işlemini başlatıyor
+
+                isCrawlPaused = true;
+                btnStartInitial.Content = "Pause";
+                btnStartInitial.Background = new SolidColorBrush(Color.FromArgb(10, 0,255, 0));  // butonun rengini değiştirebilmek için
+
+                dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+                dispatcherTimer.Tick += new EventHandler(startPollingAwaitingURLs);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 1000);
+                dispatcherTimer.Start(); // Timer'ı başlat
+
+
+            }
+        }
 
         private void clearDBandStart(object sender, RoutedEventArgs e)
         {
+
             if (txtInputUrl.Text.IsValidUrl() == false)
             {
                 MessageBox.Show("please enter a valid url");
@@ -126,21 +161,23 @@ namespace Crawler
             }
             else
             {
-
                 dtStartDate = DateTime.Now;
-                // clearDatabase();
                 crawlPage(txtInputUrl.Text.normalizeUrl(), 0, txtInputUrl.Text.normalizeUrl(), DateTime.Now);
                 checkingTimer();
+
             }
+
         }
 
-        private void checkingTimer()
-        {
-            System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(startPollingAwaitingURLs);
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 1000);
-            dispatcherTimer.Start();
-        }
+
+
+
+
+
+
+
+
+
 
         private static object _lock_CrawlingSync = new object();
         private static bool blBeingProcessed = false;
