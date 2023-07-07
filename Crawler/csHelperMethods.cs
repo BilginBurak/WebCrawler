@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Threading;
 using System.Xml;
 using static Crawler.csHelperMethods;
+using static Crawler.MainWindow;
 
 
 namespace Crawler
@@ -70,63 +71,82 @@ namespace Crawler
             public List<string> lstDiscoveredLinks = new List<string>();
         }
 
-        public static void crawlPage(string srUrlToCrawl, int irUrlDepthLevel, string _srParentUrl, DateTime _dtDiscoverDate)
-        {
-            var vrLocalUrl = srUrlToCrawl;
-            crawlingResult crawlResult = new crawlingResult();
-            crawlResult.Url = vrLocalUrl;
-            if (!string.IsNullOrEmpty(_srParentUrl))
-                crawlResult.ParentUrlHash = _srParentUrl;
-            if (_dtDiscoverDate != DateTime.MinValue)
-                crawlResult.DiscoverDate = _dtDiscoverDate;
-
-            Stopwatch swTimerCrawling = new Stopwatch();
-            swTimerCrawling.Start();
-
-            HtmlWeb wbClient = new HtmlWeb();//you should use httpwebrequest for more control and better performance
-            wbClient.AutoDetectEncoding = true;
-            wbClient.BrowserTimeout = new TimeSpan(0, 2, 0);
-            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-
-            try
-            {
-                doc = wbClient.Load(crawlResult.Url);
-                crawlResult.SourceCode = doc.Text;
-            }
-            catch (Exception E)
-            {
-                crawlResult.blcrawlSuccess = false;
-                logError(E, "crawlPage");
-            }
-
-            Interlocked.Increment(ref irCrawledUrlCount);
-
-            swTimerCrawling.Stop();
-            crawlResult.FetchTimeMS = Convert.ToInt32(swTimerCrawling.ElapsedMilliseconds);
-            crawlResult.LastCrawlingDate = DateTime.Now;
 
 
 
-
-            var vrDocTitle = doc.DocumentNode.SelectSingleNode("//title")?.InnerText.ToString().Trim();
-            // vrDocTitle = System.Net.WebUtility.HtmlDecode(vrDocTitle);
-            crawlResult.PageTile = vrDocTitle;
+ 
 
 
 
 
 
-            saveCrawlInDatabase(crawlResult);
 
-            if (crawlResult.blcrawlSuccess)
-            {
-                extractLinks(crawlResult, doc);
-                saveDiscoveredLinksInDatabaseForFutureCrawling(crawlResult);
-            }
 
-            doc = null;
 
-        }
+
+                public static void crawlPage(string srUrlToCrawl, int irUrlDepthLevel, string _srParentUrl, DateTime _dtDiscoverDate)
+                {
+                    var vrLocalUrl = srUrlToCrawl;
+                    crawlingResult crawlResult = new crawlingResult();
+                    crawlResult.Url = vrLocalUrl;
+                    if (!string.IsNullOrEmpty(_srParentUrl))
+                        crawlResult.ParentUrlHash = _srParentUrl;
+                    if (_dtDiscoverDate != DateTime.MinValue)
+                        crawlResult.DiscoverDate = _dtDiscoverDate;
+
+                    Stopwatch swTimerCrawling = new Stopwatch();
+                    swTimerCrawling.Start();
+
+                    HtmlWeb wbClient = new HtmlWeb();//you should use httpwebrequest for more control and better performance
+                    wbClient.AutoDetectEncoding = true;
+                    wbClient.BrowserTimeout = new TimeSpan(0, 2, 0);
+                    HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+
+                    try
+                    {
+                        doc = wbClient.Load(crawlResult.Url);
+                        crawlResult.SourceCode = doc.Text;
+                    }
+                    catch (Exception E)
+                    {
+                        crawlResult.blcrawlSuccess = false;
+                        logError(E, "crawlPage");
+                    }
+
+                    Interlocked.Increment(ref irCrawledUrlCount);
+
+                    swTimerCrawling.Stop();
+                    crawlResult.FetchTimeMS = Convert.ToInt32(swTimerCrawling.ElapsedMilliseconds);
+                    crawlResult.LastCrawlingDate = DateTime.Now;
+
+
+
+
+                    var vrDocTitle = doc.DocumentNode.SelectSingleNode("//title")?.InnerText.ToString().Trim();
+                    // vrDocTitle = System.Net.WebUtility.HtmlDecode(vrDocTitle);
+                    crawlResult.PageTile = vrDocTitle;
+
+
+
+
+
+                    saveCrawlInDatabase(crawlResult);
+
+                    if (crawlResult.blcrawlSuccess)
+                    {
+                        extractLinks(crawlResult, doc);
+                        saveDiscoveredLinksInDatabaseForFutureCrawling(crawlResult);
+                    }
+
+                    doc = null;
+
+                }
+
+      
+
+
+
+
 
         private static object _lockDatabaseAdd = new object();
 
@@ -262,10 +282,18 @@ namespace Crawler
             return HtmlEntity.DeEntitize(srUrl);
         }
 
+        public static int invalidUrl = 0;
+
+
+
+
+
+
+
+
         private static void extractLinks(crawlingResult myCrawlingResult, HtmlDocument doc)
         {
             var baseUri = new Uri(myCrawlingResult.Url);
-
 
 
             var vrDocTitle = doc.DocumentNode.SelectSingleNode("//title")?.InnerText.ToString().Trim();
@@ -279,14 +307,23 @@ namespace Crawler
             if (vrNodes != null)
                 foreach (HtmlNode link in vrNodes)//xpath notation
                 {
-                    HtmlAttribute att = link.Attributes["href"];
-                    //this is used to convert from relative path to absolute path
-                    var absoluteUri = new Uri(baseUri, att.Value.ToString().decodeUrl());
+                    try
+                    {
 
-                    if (!absoluteUri.ToString().StartsWith("http://") && !absoluteUri.ToString().StartsWith("https://"))
-                        continue;
+                        HtmlAttribute att = link.Attributes["href"];
+                        //this is used to convert from relative path to absolute path
+                        var absoluteUri = new Uri(baseUri, att.Value.ToString().decodeUrl());
 
-                    myCrawlingResult.lstDiscoveredLinks.Add(absoluteUri.ToString().Split('#').FirstOrDefault());
+                        if (!absoluteUri.ToString().StartsWith("http://") && !absoluteUri.ToString().StartsWith("https://"))
+                            continue;
+
+                        myCrawlingResult.lstDiscoveredLinks.Add(absoluteUri.ToString().Split('#').FirstOrDefault());
+
+                    }
+                    catch
+                    {
+                        invalidUrl++;
+                    }
 
 
 
@@ -364,6 +401,7 @@ namespace Crawler
 
         private static StreamWriter swLog = new StreamWriter("logs.txt", true, Encoding.UTF8);
         private static object _lock_swLogs = new object();
+
         public static void logMesssage(string srMsg)
         {
             lock (_lock_swLogs)

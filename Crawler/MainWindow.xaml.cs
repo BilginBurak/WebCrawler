@@ -93,6 +93,7 @@ namespace Crawler
             listBoxResults.ItemsSource = UserLogs;
             lstUserLogs.ItemsSource = LogSummary;
             fillFromDbDropdown();
+            
         }
 
 
@@ -204,7 +205,7 @@ namespace Crawler
 
                 string srPassedTime = (DateTime.Now - dtStartDate).TotalMinutes.ToString("N2");
                 LogSummary.Clear();
-                LogSummary.Insert(0, $"Total Time: {srPassedTime} Minutes \t Total Crawled Links Count: {irCrawledUrlCount.ToString("N0")}");
+                LogSummary.Insert(0, $"Total Time: {srPassedTime} Minutes \t Total Crawled Links Count: {irCrawledUrlCount.ToString("N0")} \t invalid urls:{csHelperMethods.invalidUrl.ToString()}");
                 LogSummary.Insert(0, $"{DateTime.Now} polling awaiting urls \t processing: {blBeingProcessed} \t Number of crawling tasks: {lstCrawlingTasks.Count}");
                 LogSummary.Insert(0, $"Crawling Speed Per Minute: {srPerMinCrawlingspeed} \t Total Discovered Links : {irDiscoveredUrlCount.ToString("N0")} \t Discovered Url Speed: {srPerMinDiscoveredLinkSpeed} ");
             }
@@ -289,6 +290,7 @@ namespace Crawler
             if(dispatcherTimer!=null)   dispatcherTimer.Stop();
             btnStartInitial.Content = "restart";
             clearDatabase();
+            LogSummary.Clear();
         }
 
 
