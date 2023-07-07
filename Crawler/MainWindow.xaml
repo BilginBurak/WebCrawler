@@ -71,11 +71,13 @@
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
 
-                                <Button x:Name="btnStartInitial" Click="clearDBandStart"  MinHeight="35" MinWidth="100" Content="Start Crawl" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100" Background="#00000000"/>
+                                <Button x:Name="btnStartInitial" Click="clearDBandStart"  MinHeight="35" MinWidth="100" Content="Start Crawl" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100" Background="#FF2F2F2F"/>
                                 <Button x:Name="btnTest" Click="btnTest_Click" MinWidth="100" MinHeight="35" Content="Test DB" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100"/>
                                 <Button x:Name="btnCleanTxt" Click="btnCleanTxt_Click" MinWidth="100" MinHeight="35" Content="Clean URL" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100"/>
                                 <Button x:Name="btnClear" Click="btnClear_Click" MinWidth="100" MinHeight="35" Content="Clear Database" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100" />
                                 <Button x:Name="btnAddFav" Click="btnAddFav_Click" MinWidth="100" MinHeight="35" Content="ADD Favorites" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100" />
+                                
+                                
 
 
                             </StackPanel>
@@ -83,7 +85,7 @@
 
                         <Grid>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                             
+
                                 <mah:SplitButton  x:Name="dropFavSelector"  Margin="5,11,5,11" Width="425"  SelectionChanged="dropFavSelector_SelectionChanged" />
 
                                 <Button x:Name="btnClearFav" Click="btnClearFav_Click" MinWidth="100" MinHeight="35" Content="Delete Favorite" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100" />
@@ -93,6 +95,14 @@
                         <Grid>
                             <ListBox  x:Name="lstUserLogs" d:ItemsSource="{d:SampleData ItemCount=3}"  BorderThickness="1,1,1,1" Margin="10,10,10,10" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Height="90" ScrollViewer.VerticalScrollBarVisibility="Disabled" Padding="0,6,0,0"/>
                         </Grid>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button x:Name="btnEmergency" Click="btnEmergency_Click" MinWidth="100" MinHeight="35" Content="Emergency Stop" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100" />
+
+                            <Button x:Name="btnExportTxt" Click="btnExportTxt_Click" MinWidth="100" MinHeight="35" Content="Export as FILE" HorizontalAlignment="Center" MaxWidth="120" Margin="5,11,5,11" Width="100" />
+                            <mah:SplitButton  x:Name="dropExportFileExt" Width="100" Margin="5,11,5,11"  SelectionChanged="dropExportFileExt_SelectionChanged" SelectedIndex="0"/>
+
+                        </StackPanel>
 
                     </StackPanel>
 

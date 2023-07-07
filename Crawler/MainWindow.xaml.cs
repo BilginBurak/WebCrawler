@@ -23,6 +23,13 @@ using System.Runtime.Remoting.Contexts;
 using System.Web.UI.WebControls;
 using System.Web.Configuration;
 using System.Windows.Threading;
+using System.Data.SqlClient;
+using System.Data;
+using System.IO;
+using ControlzEx.Standard;
+using System.Windows.Forms;
+using MessageBox = System.Windows.Forms.MessageBox;
+using MessageBoxResult = System.Windows.Forms.DialogResult;
 
 namespace Crawler
 {
@@ -74,7 +81,7 @@ namespace Crawler
             }
         }
 
- 
+
 
         public MainWindow()
         {
@@ -109,7 +116,11 @@ namespace Crawler
                     MessageBox.Show(ex.Message);
                 }
             }
+
+            dropExportFileExt.Items.Add("csv");
+            dropExportFileExt.Items.Add("txt");
         }
+
 
 
 
@@ -129,19 +140,18 @@ namespace Crawler
                 // Crawl işlemi duraklatıyor
                 isCrawlPaused = false;
                 btnStartInitial.Content = "Continue";
-                btnStartInitial.Background = new SolidColorBrush(Color.FromArgb(10, 255, 0, 0));  // butonun rengini değiştirebilmek için
+                btnStartInitial.Background = new SolidColorBrush(Color.FromArgb(15, 0, 255, 0));  // butonun rengini değiştirebilmek için
                 dispatcherTimer.Stop(); // Timer'ı duraklat
 
             }
             else
             {
-                
+
                 //burası crawl işlemini başlatıyor
 
                 isCrawlPaused = true;
                 btnStartInitial.Content = "Pause";
-                btnStartInitial.Background = new SolidColorBrush(Color.FromArgb(10, 0,255, 0));  // butonun rengini değiştirebilmek için
-
+                btnStartInitial.Background = new SolidColorBrush(Color.FromArgb(15, 255, 0, 0));  // butonun rengini değiştirebilmek için
                 dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
                 dispatcherTimer.Tick += new EventHandler(startPollingAwaitingURLs);
                 dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 1000);
@@ -275,22 +285,32 @@ namespace Crawler
         {
             fillFromDbDropdown();
             txtInputUrl.Focus();
+            isCrawlPaused = false;
+            if(dispatcherTimer!=null)   dispatcherTimer.Stop();
+            btnStartInitial.Content = "restart";
+            clearDatabase();
         }
 
 
 
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
-            using (DBCrawling db = new DBCrawling())
+            MessageBoxResult result = MessageBox.Show("You will delete database", "Are u sure?");
+            if (result != MessageBoxResult.Yes)
             {
-                try
-                {
-                    csHelperMethods.clearDatabase();
 
-                }
-                catch (Exception ex)
+
+                using (DBCrawling db = new DBCrawling())
                 {
-                    MessageBox.Show(ex.Message);
+                    try
+                    {
+                        csHelperMethods.clearDatabase();
+
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
                 }
             }
         }
@@ -382,26 +402,9 @@ namespace Crawler
                 {
                     MessageBox.Show(ex.Message);
                 }
-
-
-                /*
-
-                try
-                {
-
-
-                    db.tblFavUrls.Remove(dropFavSelector.SelectedValue as tblFavUrls);
-
-                    db.SaveChanges();
-                    fillFromDbDropdown();
-
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-                */
             }
+
+
 
         }
 
@@ -425,6 +428,74 @@ namespace Crawler
                 {
                     txtInputUrl.Text = (ex.Message);
                 }
+        }
+
+
+
+
+        private static object _exporting = new object();
+
+        string fileName = "";
+        private void btnExportTxt_Click(object sender, RoutedEventArgs e)
+        {
+
+
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+            // Show the FolderBrowserDialog dialog.
+            folderBrowserDialog.ShowDialog();
+
+            // Get the path of the selected folder.
+            string fileLocation = folderBrowserDialog.SelectedPath;
+
+            fileLocation = fileLocation + fileName;
+
+            try
+            {
+
+                using (StreamWriter sw = new StreamWriter(fileLocation))
+                {
+                    using (DBCrawling db = new DBCrawling())
+                    {
+                        var data = db.tblMainUrls.ToList();
+                        foreach (var item in data)
+                        {
+                            
+                            lock (_exporting)
+                            {
+                                foreach (var prop in item.GetType().GetProperties())
+                                {
+                                    sw.Write(prop.GetValue(item) + ",");
+                                }
+                                sw.WriteLine();
+                            }
+                        }
+
+                        MessageBox.Show($"export operations successful. Location: {fileLocation}");
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to export {ex.Message}");
+            }
+
+        }
+
+
+
+        private void dropExportFileExt_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string fileExtention = dropExportFileExt.SelectedValue.ToString();
+            fileName = ($"\\exportDatabase.{fileExtention}");
+
+        }
+
+        private void btnEmergency_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow mainWindow = new MainWindow();
+            mainWindow.Show();
+            this.Close();
         }
     }
 }
