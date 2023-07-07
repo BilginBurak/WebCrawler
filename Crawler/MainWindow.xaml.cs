@@ -93,7 +93,7 @@ namespace Crawler
             listBoxResults.ItemsSource = UserLogs;
             lstUserLogs.ItemsSource = LogSummary;
             fillFromDbDropdown();
-            
+
         }
 
 
@@ -130,7 +130,7 @@ namespace Crawler
 
         DateTime dtStartDate;
 
-
+        private static bool blProccesStopped = false;
         private static bool isCrawlPaused = false;
         private System.Windows.Threading.DispatcherTimer dispatcherTimer;
 
@@ -142,6 +142,8 @@ namespace Crawler
                 isCrawlPaused = false;
                 btnStartInitial.Content = "Continue";
                 btnStartInitial.Background = new SolidColorBrush(Color.FromArgb(15, 0, 255, 0));  // butonun rengini değiştirebilmek için
+
+                writeLogSummary(blProccesStopped);
                 dispatcherTimer.Stop(); // Timer'ı duraklat
 
             }
@@ -156,6 +158,8 @@ namespace Crawler
                 dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
                 dispatcherTimer.Tick += new EventHandler(startPollingAwaitingURLs);
                 dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 1000);
+                blProccesStopped = true;
+                writeLogSummary(blProccesStopped);
                 dispatcherTimer.Start(); // Timer'ı başlat
 
 
@@ -184,21 +188,11 @@ namespace Crawler
 
 
 
-
-
-
-
-
-
-        private static object _lock_CrawlingSync = new object();
-        private static bool blBeingProcessed = false;
-        private static List<Task> lstCrawlingTasks = new List<Task>();
-        private static List<string> lstCurrentlyCrawlingUrls = new List<string>();
-
-        private void startPollingAwaitingURLs(object sender, EventArgs e)
+        private void writeLogSummary(bool blBeingProcessed)
         {
             lock (LogSummary)
             {
+
                 string srPerMinCrawlingspeed = (irCrawledUrlCount.ToDouble() / (DateTime.Now - dtStartDate).TotalMinutes).ToString("N2");
 
                 string srPerMinDiscoveredLinkSpeed = (irDiscoveredUrlCount.ToDouble() / (DateTime.Now - dtStartDate).TotalMinutes).ToString("N2");
@@ -215,9 +209,27 @@ namespace Crawler
             if (blBeingProcessed)
                 return;
 
+
+        }
+
+
+
+
+
+        private static object _lock_CrawlingSync = new object();
+
+        private static List<Task> lstCrawlingTasks = new List<Task>();
+        private static List<string> lstCurrentlyCrawlingUrls = new List<string>();
+
+        private void startPollingAwaitingURLs(object sender, EventArgs e)
+        {
+
+            writeLogSummary(blProccesStopped);
+
+
+
             lock (_lock_CrawlingSync)
             {
-                blBeingProcessed = true;
 
                 lstCrawlingTasks = lstCrawlingTasks.Where(pr => pr.Status != TaskStatus.RanToCompletion && pr.Status != TaskStatus.Faulted).ToList();
 
@@ -274,7 +286,7 @@ namespace Crawler
                         }
                     }
 
-                blBeingProcessed = false;
+
             }
         }
 
@@ -287,7 +299,7 @@ namespace Crawler
             fillFromDbDropdown();
             txtInputUrl.Focus();
             isCrawlPaused = false;
-            if(dispatcherTimer!=null)   dispatcherTimer.Stop();
+            if (dispatcherTimer != null) dispatcherTimer.Stop();
             btnStartInitial.Content = "restart";
             clearDatabase();
             LogSummary.Clear();
@@ -435,6 +447,14 @@ namespace Crawler
 
 
 
+
+
+
+
+
+
+
+
         private static object _exporting = new object();
 
         string fileName = "";
@@ -461,7 +481,7 @@ namespace Crawler
                         var data = db.tblMainUrls.ToList();
                         foreach (var item in data)
                         {
-                            
+
                             lock (_exporting)
                             {
                                 foreach (var prop in item.GetType().GetProperties())
@@ -483,7 +503,6 @@ namespace Crawler
             }
 
         }
-
 
 
         private void dropExportFileExt_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -74,7 +74,6 @@ namespace Crawler
 
 
 
- 
 
 
 
@@ -84,65 +83,66 @@ namespace Crawler
 
 
 
-                public static void crawlPage(string srUrlToCrawl, int irUrlDepthLevel, string _srParentUrl, DateTime _dtDiscoverDate)
-                {
-                    var vrLocalUrl = srUrlToCrawl;
-                    crawlingResult crawlResult = new crawlingResult();
-                    crawlResult.Url = vrLocalUrl;
-                    if (!string.IsNullOrEmpty(_srParentUrl))
-                        crawlResult.ParentUrlHash = _srParentUrl;
-                    if (_dtDiscoverDate != DateTime.MinValue)
-                        crawlResult.DiscoverDate = _dtDiscoverDate;
 
-                    Stopwatch swTimerCrawling = new Stopwatch();
-                    swTimerCrawling.Start();
+        public static void crawlPage(string srUrlToCrawl, int irUrlDepthLevel, string _srParentUrl, DateTime _dtDiscoverDate)
+        {
+            var vrLocalUrl = srUrlToCrawl;
+            crawlingResult crawlResult = new crawlingResult();
+            crawlResult.Url = vrLocalUrl;
+            if (!string.IsNullOrEmpty(_srParentUrl))
+                crawlResult.ParentUrlHash = _srParentUrl;
+            if (_dtDiscoverDate != DateTime.MinValue)
+                crawlResult.DiscoverDate = _dtDiscoverDate;
 
-                    HtmlWeb wbClient = new HtmlWeb();//you should use httpwebrequest for more control and better performance
-                    wbClient.AutoDetectEncoding = true;
-                    wbClient.BrowserTimeout = new TimeSpan(0, 2, 0);
-                    HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+            Stopwatch swTimerCrawling = new Stopwatch();
+            swTimerCrawling.Start();
 
-                    try
-                    {
-                        doc = wbClient.Load(crawlResult.Url);
-                        crawlResult.SourceCode = doc.Text;
-                    }
-                    catch (Exception E)
-                    {
-                        crawlResult.blcrawlSuccess = false;
-                        logError(E, "crawlPage");
-                    }
+            HtmlWeb wbClient = new HtmlWeb();//you should use httpwebrequest for more control and better performance
+            wbClient.AutoDetectEncoding = true;
+            wbClient.BrowserTimeout = new TimeSpan(0, 2, 0);
+            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
 
-                    Interlocked.Increment(ref irCrawledUrlCount);
+            try
+            {
+                doc = wbClient.Load(crawlResult.Url);
+                crawlResult.SourceCode = doc.Text;
+            }
+            catch (Exception E)
+            {
+                crawlResult.blcrawlSuccess = false;
+                logError(E, "crawlPage");
+            }
 
-                    swTimerCrawling.Stop();
-                    crawlResult.FetchTimeMS = Convert.ToInt32(swTimerCrawling.ElapsedMilliseconds);
-                    crawlResult.LastCrawlingDate = DateTime.Now;
+            Interlocked.Increment(ref irCrawledUrlCount);
 
-
-
-
-                    var vrDocTitle = doc.DocumentNode.SelectSingleNode("//title")?.InnerText.ToString().Trim();
-                    // vrDocTitle = System.Net.WebUtility.HtmlDecode(vrDocTitle);
-                    crawlResult.PageTile = vrDocTitle;
+            swTimerCrawling.Stop();
+            crawlResult.FetchTimeMS = Convert.ToInt32(swTimerCrawling.ElapsedMilliseconds);
+            crawlResult.LastCrawlingDate = DateTime.Now;
 
 
 
 
+            var vrDocTitle = doc.DocumentNode.SelectSingleNode("//title")?.InnerText.ToString().Trim();
+            // vrDocTitle = System.Net.WebUtility.HtmlDecode(vrDocTitle);
+            crawlResult.PageTile = vrDocTitle;
 
-                    saveCrawlInDatabase(crawlResult);
 
-                    if (crawlResult.blcrawlSuccess)
-                    {
-                        extractLinks(crawlResult, doc);
-                        saveDiscoveredLinksInDatabaseForFutureCrawling(crawlResult);
-                    }
 
-                    doc = null;
 
-                }
 
-      
+            saveCrawlInDatabase(crawlResult);
+
+            if (crawlResult.blcrawlSuccess)
+            {
+                extractLinks(crawlResult, doc);
+                saveDiscoveredLinksInDatabaseForFutureCrawling(crawlResult);
+            }
+
+            doc = null;
+
+        }
+
+
 
 
 
@@ -232,8 +232,11 @@ namespace Crawler
 
                     if (vrResult != null)
                     {
+                        finalObject.ParentUrlHash = vrResult.UrlHash;
                         finalObject.DiscoverDate = vrResult.DiscoverDate;
-                        finalObject.LinkDepthLevel = vrResult.LinkDepthLevel;
+                        finalObject.PageTile = crawledResult.PageTile;
+                        
+                        finalObject.LinkDepthLevel = (short)(vrResult.LinkDepthLevel + 1);          // link derinliğini buradan çözdüm 
                         finalObject.CrawlTryCounter = vrResult.CrawlTryCounter;
                         if (crawledResult.blcrawlSuccess == false)
                             finalObject.CrawlTryCounter++;
