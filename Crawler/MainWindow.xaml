@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:Crawler" 
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
-        Title="MainWindow" MinHeight="500" MinWidth="800" Width="1000" Height="600">
+        Title="MainWindow" MinHeight="500" MinWidth="800" Width="1000" Height="600" Icon="/OIG-removebg-preview.png" >
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands>
 

@@ -288,6 +288,8 @@
       <DependentUpon>dbManager.edmx</DependentUpon>
       <LastGenOutput>dbManager.cs</LastGenOutput>
     </Content>
+    <Resource Include="OIG-removebg-preview.png" />
+    <Resource Include="Spider-Crawlerweb-shine.png" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
